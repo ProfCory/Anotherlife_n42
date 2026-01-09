@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>ALN ATM</title>
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; background: rgba(0,0,0,0); }
+    .panel{
+      position:absolute; right:4%; top:12%;
+      width:360px; padding:14px 14px 10px;
+      background: rgba(20,20,24,0.93);
+      color:#fff; border-radius:14px;
+      border:1px solid rgba(255,255,255,0.08);
+      box-shadow:0 18px 50px rgba(0,0,0,0.35);
+      display:none;
+    }
+    .row{ display:flex; justify-content:space-between; margin:8px 0; }
+    .muted{ opacity:0.85; font-size:12px; }
+    input{
+      width:100%; padding:10px 10px; margin-top:8px;
+      border-radius:12px; border:1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06); color:#fff;
+      outline:none;
+    }
+    .btn{
+      width:100%; margin-top:10px; padding:10px 12px;
+      border-radius:12px; border:1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08); color:#fff; cursor:pointer;
+    }
+    .btn.secondary{ background: rgba(80,140,255,0.14); }
+    .btn.danger{ background: rgba(255,80,80,0.14); }
+    .hr{ height:1px; background: rgba(255,255,255,0.08); margin:10px 0; }
+  </style>
+</head>
+<body>
+  <div class="panel" id="panel">
+    <div style="font-size:18px;">ATM</div>
+    <div class="muted" id="status"></div>
+
+    <div class="hr"></div>
+
+    <div class="row"><span>Cash</span><b id="cash">$0</b></div>
+    <div class="row"><span>Bank</span><b id="bank">$0</b></div>
+
+    <div class="hr"></div>
+
+    <div id="cardBox"></div>
+
+    <input id="amount" type="number" placeholder="Amount" />
+    <button class="btn secondary" id="deposit">Deposit (Cash → Bank)</button>
+    <button class="btn" id="withdraw">Withdraw (Bank → Cash)</button>
+
+    <button class="btn danger" id="close">Close</button>
+  </div>
+
+<script>
+  const panel = document.getElementById('panel');
+  const cashEl = document.getElementById('cash');
+  const bankEl = document.getElementById('bank');
+  const statusEl = document.getElementById('status');
+  const cardBox = document.getElementById('cardBox');
+  const amountEl = document.getElementById('amount');
+
+  let hasCard = false;
+  let cardCost = 100;
+
+  function fmt(n){ return '$' + (Number(n||0)).toLocaleString(); }
+
+  function renderCard(){
+    if(hasCard){
+      cardBox.innerHTML = `<div class="muted">ATM Card: <b>Active</b></div>`;
+    } else {
+      cardBox.innerHTML = `
+        <div class="muted">ATM Card required.</div>
+        <button class="btn" id="buy">Buy ATM Card (${cardCost})</button>
+      `;
+      document.getElementById('buy').onclick = () => {
+        fetch(`https://${GetParentResourceName()}/atm_buy_card`, { method:'POST', body:'{}' });
+      };
+    }
+  }
+
+  window.addEventListener('message', (e) => {
+    const d = e.data || {};
+    if(d.type === 'atm_open'){
+      panel.style.display = 'block';
+      cashEl.textContent = fmt(d.cash);
+      bankEl.textContent = fmt(d.bank);
+      hasCard = !!d.hasCard;
+      cardCost = d.cardCost || 100;
+      statusEl.textContent = 'Use ESC/Backspace to close';
+      renderCard();
+    }
+    if(d.type === 'atm_update'){
+      cashEl.textContent = fmt(d.cash);
+      bankEl.textContent = fmt(d.bank);
+      hasCard = !!d.hasCard;
+      renderCard();
+    }
+    if(d.type === 'atm_close'){
+      panel.style.display = 'none';
+    }
+  });
+
+  document.getElementById('deposit').onclick = () => {
+    const amt = Number(amountEl.value||0);
+    fetch(`https://${GetParentResourceName()}/atm_deposit`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amount: amt })
+    });
+  };
+
+  document.getElementById('withdraw').onclick = () => {
+    const amt = Number(amountEl.value||0);
+    fetch(`https://${GetParentResourceName()}/atm_withdraw`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ amount: amt })
+    });
+  };
+
+  document.getElementById('close').onclick = () => {
+    fetch(`https://${GetParentResourceName()}/atm_close`, { method:'POST', body:'{}' });
+  };
+</script>
+</body>
+</html>
