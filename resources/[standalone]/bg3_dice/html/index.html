@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BG3 Dice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="overlay" style="display:none">
+    <div class="dark-sting" id="darkSting"></div>
+    <div class="vignette"></div>
+    <div class="stage">
+      <canvas id="dice-canvas"></canvas>
+      <div class="hud">
+        <div class="title">D20 CHECK</div>
+        <div class="mode-badge" id="modeBadge" style="display:none">ADVANTAGE</div>
+        <div class="line"><span id="rollText">—</span></div>
+        <div class="line small" id="dcText"></div>
+        <div class="line small" id="rollsInfo"></div>
+        <div class="line result" id="outcome">ROLLING…</div>
+      </div>
+    </div>
+  </div>
+  <script src="three.min.js"></script>
+  <script src="translation.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
