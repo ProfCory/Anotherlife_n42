@@ -1,0 +1,268 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+
+* {
+  font-family: "Poppins", sans-serif;
+}
+
+#main-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Money */
+#money-container {
+  position: absolute;
+  right: 2vw;
+  top: 2vh;
+  font-weight: 400;
+  font-size: 29px;
+}
+
+#money {
+  text-align: right;
+  color: #28a745;
+}
+
+#money-minus {
+  text-align: right;
+  color: red;
+}
+
+#cash,
+#bank,
+#plus {
+  color: #ededed;
+}
+
+#minus {
+  color: red;
+}
+
+/* Player HUD */
+
+#playerhud {
+  display: flex;
+  position: absolute;
+  bottom: 0.50vh;
+  left: 1.5vh;
+}
+
+/* Vehicle HUD */
+
+.ui-car-fuel,
+.ui-car-nos,
+.ui-car-seatbelt,
+.ui-car-cruise,
+.ui-car-speed,
+.ui-car-street {
+  position: absolute;
+}
+
+.ui-car-speed {
+  bottom: 4vh;
+  left: 16vw;
+}
+
+.ui-car-fuel {
+  left: 18.9vw;
+  bottom: 1.9vw;
+}
+
+.ui-car-nos {
+  left: 16.7vw;
+  bottom: 5.4vw;
+}
+
+.ui-car-seatbelt {
+  left: 19.1vw;
+  bottom: 3.56vw;
+}
+
+.ui-car-cruise {
+  left: 18.3vw;
+  bottom: 8.7vh;
+}
+
+.ui-car-street {
+  font-size: 15px;
+  text-transform: uppercase;
+  bottom: 0vh;
+  left: 16.5vw;
+  color: #ededed;
+}
+
+/* Animation */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+/* =========================================================
+   Retro Digital Dash (80s/90s VFD)
+   ========================================================= */
+
+#retro-dash {
+  position: absolute;
+  bottom: 3.2vh;
+  left: 16vw; /* aligns near existing vehicle hud cluster */
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  background: rgba(0, 0, 0, 0.80);
+  border-radius: 12px;
+  padding: 10px 12px;
+
+  font-family: 'VT323', monospace;
+  text-transform: uppercase;
+  user-select: none;
+  pointer-events: none; /* never steal clicks */
+}
+
+.retro-rpm-bubble {
+  position: relative;
+  width: 86px;
+  height: 86px;
+}
+
+.retro-rpm-ring {
+  width: 86px;
+  height: 86px;
+  display: block;
+}
+
+.retro-rpm-track {
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 8;
+  fill: none;
+}
+
+.retro-rpm-value {
+  stroke-width: 8;
+  fill: none;
+
+  /* segmented look */
+  stroke-dasharray: 5 6;
+  stroke-linecap: butt;
+
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+
+  /* circumference for r=45 is ~282.74 */
+  stroke-dashoffset: 282.74;
+  transition: stroke 120ms linear, stroke-dashoffset 120ms linear;
+}
+
+.retro-gear {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 34px;
+  letter-spacing: 1px;
+  color: #00ff66; /* chevy-green */
+  text-shadow: 0 0 6px rgba(0,255,102,0.35);
+}
+
+.retro-speed {
+  min-width: 86px;
+  text-align: center;
+}
+
+.retro-speed-value {
+  font-size: 64px;
+  line-height: 0.85;
+  color: #00f0ff; /* cyan */
+  text-shadow: 0 0 8px rgba(0,240,255,0.35);
+}
+
+.retro-speed-unit {
+  font-size: 16px;
+  color: #ffb000; /* amber */
+  opacity: 0.95;
+  margin-top: 2px;
+}
+
+.retro-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.retro-engine {
+  font-size: 18px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 51, 51, 0.35);
+  color: #ff3333;
+  background: rgba(255, 51, 51, 0.08);
+  opacity: 0.0;
+}
+
+.retro-engine.critical {
+  animation: retroBlink 1s infinite;
+}
+
+.retro-fuel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.retro-fuel-label {
+  font-size: 12px;
+  color: #ffb000;
+  opacity: 0.9;
+  text-align: left;
+}
+
+.retro-fuel-segs {
+  display: flex;
+  gap: 2px;
+}
+
+.retro-fuel-segs span {
+  width: 8px;
+  height: 14px;
+  background: rgba(255, 176, 0, 0.15);
+  border: 1px solid rgba(255, 176, 0, 0.20);
+  border-radius: 2px;
+}
+
+.retro-fuel-segs span.on {
+  background: rgba(255, 176, 0, 0.85);
+  border-color: rgba(255, 176, 0, 0.75);
+  box-shadow: 0 0 6px rgba(255, 176, 0, 0.35);
+}
+
+.retro-belt {
+  font-size: 18px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 51, 51, 0.25);
+  color: rgba(255, 51, 51, 0.35);
+  background: rgba(255, 51, 51, 0.05);
+  opacity: 0.7;
+}
+
+.retro-belt.on {
+  color: rgba(255, 51, 51, 1.0);
+  background: rgba(255, 51, 51, 0.12);
+  border-color: rgba(255, 51, 51, 0.55);
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.25);
+}
+
+@keyframes retroBlink {
+  50% { opacity: 0.0; }
+}

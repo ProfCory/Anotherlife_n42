@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link href="keks.css" rel="stylesheet" type="text/css" />
+    <title>ALN42 Loading…</title>
+  </head>
+
+  <body>
+    <div class="backdrop">
+      <div class="vignette"></div>
+      <div class="rain" aria-hidden="true"></div>
+
+      <header class="top">
+        <div class="brand">
+          <div class="logoWrap">
+            <img class="logo" src="myLogo.png" alt="ALN42 logo" />
+          </div>
+
+          <div class="brandText">
+            <h1>ALN42</h1>
+            <h2>Wet streets. Bad odds. A cheap phone in your hand.</h2>
+          </div>
+        </div>
+
+        <div class="meta">
+          <div class="pill" id="phasePill">Initializing</div>
+          <div class="pill subtle" id="emojiLine" aria-hidden="true"></div>
+        </div>
+      </header>
+
+      <main class="panel">
+        <div class="panelHead">
+          <div>
+            <h3 class="panelTitle">Connecting</h3>
+            <div class="panelSub" id="statusLine">Warming up the city…</div>
+          </div>
+          <div class="pct" id="pctText">0%</div>
+        </div>
+
+        <div class="loadbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="thingy" id="bar"></div>
+        </div>
+
+        <div class="tipRow">
+          <div class="tipLabel">ALN42</div>
+          <div class="tipText" id="tipText">Rain is normal. Surviving the night is the win.</div>
+        </div>
+      </main>
+
+      <footer class="bottom">
+        <div id="gradient"></div>
+      </footer>
+    </div>
+
+    <script type="text/javascript">
+      let count = 0;
+      let thisCount = 0;
+      let lastPct = 0;
+
+      const elBar = document.getElementById("bar");
+      const elPct = document.getElementById("pctText");
+      const elStatus = document.getElementById("statusLine");
+      const elEmoji = document.getElementById("emojiLine");
+      const elPhase = document.getElementById("phasePill");
+
+      const tips = [
+        "Rain is normal. Clear skies are a warning.",
+        "Don’t idle. The city doesn’t.",
+        "If it’s quiet, you missed the setup.",
+        "Broke is the default state. Stay sharp.",
+        "Dice decide your fate. Plan accordingly.",
+        "Night is dangerous. Morning is just grey."
+      ];
+
+      function setPct(p) {
+        const pct = Math.max(0, Math.min(100, p));
+        lastPct = pct;
+        elBar.style.width = pct + "%";
+        elPct.textContent = Math.round(pct) + "%";
+        const pb = document.querySelector(".loadbar");
+        if (pb) pb.setAttribute("aria-valuenow", String(Math.round(pct)));
+      }
+
+      function setPhase(text) {
+        elPhase.textContent = text;
+      }
+
+      function cleanLogLine(s) {
+        if (!s) return "";
+        return String(s).replace(/\^\d/g, "").trim();
+      }
+
+      // rotate tips
+      let tipIdx = 0;
+      setInterval(() => {
+        tipIdx = (tipIdx + 1) % tips.length;
+        document.getElementById("tipText").textContent = tips[tipIdx];
+      }, 4500);
+
+      const emoji = {
+        INIT_BEFORE_MAP_LOADED: ["☔"],
+        INIT_AFTER_MAP_LOADED: ["🟩", "🟦"],
+        INIT_SESSION: ["⚠", "🜁", "🜂"]
+      };
+
+      const handlers = {
+        startInitFunctionOrder(data) {
+          count = data.count || 0;
+          thisCount = 0;
+          setPhase("Initializing");
+          const e = (emoji[data.type] && emoji[data.type][data.order - 1]) || "";
+          if (e) elEmoji.textContent += e;
+        },
+
+        initFunctionInvoking(data) {
+          if (!count) return;
+          setPct((data.idx / count) * 100);
+          elStatus.textContent = "Spinning up scripts…";
+        },
+
+        startDataFileEntries(data) {
+          count = data.count || 0;
+          thisCount = 0;
+          setPhase("Streaming");
+          elEmoji.textContent += " •";
+          elStatus.textContent = "Loading data files…";
+        },
+
+        performMapLoadFunction() {
+          if (!count) return;
+          thisCount++;
+          setPct((thisCount / count) * 100);
+          elStatus.textContent = "Loading map & world…";
+        },
+
+        onLogLine(data) {
+          const msg = cleanLogLine(data && data.message);
+          if (msg) elStatus.textContent = msg;
+        },
+
+        endInitFunctionOrder() {
+          setPhase("Finalizing");
+          if (lastPct < 100) setPct(Math.max(lastPct, 96));
+        }
+      };
+
+      window.addEventListener("message", (e) => {
+        const fn = handlers[e.data.eventName];
+        if (fn) fn(e.data);
+      });
+
+      setPct(0);
+    </script>
+  </body>
+</html>
